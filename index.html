@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0b0d">
+  <title>Cancele Social Media</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Cancele home"><span class="brand-mark">C</span><span><b>Cancele</b><small>Social Media</small></span></a>
+    <label class="search"><span>⌕</span><input id="searchInput" placeholder="Search people and posts..." aria-label="Search"></label>
+    <nav class="topnav">
+      <button class="nav-btn active" data-view="feed">⌂ <span>Home</span></button>
+      <button class="nav-btn" data-view="friends">♧ <span>Friends</span></button>
+      <button class="nav-btn" data-view="marketplace">▣ <span>Marketplace</span></button>
+      <button class="nav-btn" data-view="messages">✉ <span>Messages</span></button>
+    </nav>
+    <div class="account-area"><span id="userBadge" class="user-badge">G</span><span id="accountName">Guest</span><button id="signOutBtn" class="quiet hidden">Sign out</button></div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar panel">
+      <div class="profile-mini"><div class="avatar large" id="sideAvatar">C</div><div><b id="sideName">Welcome to Cancele</b><small id="sideHandle">Connect • Share • Grow</small></div></div>
+      <button class="side-link selected" data-view="feed">◈ <span>News Feed</span></button>
+      <button class="side-link" data-view="profile">◉ <span>My Profile</span></button>
+      <button class="side-link" data-view="friends">♧ <span>Friends</span></button>
+      <button class="side-link" data-view="messages">✉ <span>Messages</span></button>
+      <button class="side-link" data-view="marketplace">▣ <span>Marketplace</span></button>
+      <button class="side-link" data-view="admin" id="adminNav" hidden>⚙ <span>Admin Console</span></button>
+      <div class="sidebar-note"><span class="gold-dot"></span><div><b>Make it a Cancele day</b><small>Good people. Real stories.</small></div></div>
+      <p class="muted tiny">Please be kind. Report harmful content and never share passwords or private financial information.</p>
+    </aside>
+
+    <section class="main-column">
+      <section id="authPanel" class="panel auth-panel">
+        <div class="eyebrow">WELCOME TO YOUR COMMUNITY</div>
+        <h1>Connect. Share. <em>Grow.</em></h1>
+        <p class="muted">A new space for friends, creators, businesses and communities.</p>
+        <div class="auth-tabs"><button class="tab active" data-auth="login">Log in</button><button class="tab" data-auth="signup">Create account</button></div>
+        <form id="authForm" class="stack">
+          <label>Email address<input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></label>
+          <label>Password<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="At least 6 characters"></label>
+          <label id="fullNameWrap" class="hidden">Your name<input id="fullName" autocomplete="name" placeholder="Your display name"></label>
+          <button class="primary" id="authSubmit" type="submit">Log in</button>
+          <p id="authMessage" class="form-message" role="status"></p>
+        </form>
+        <p class="tiny muted">Account access is powered by Supabase after you configure your project keys below. Never put a service-role key in this website.</p>
+      </section>
+
+      <section id="feedView" class="view">
+        <div class="welcome-row"><div><div class="eyebrow">YOUR COMMUNITY</div><h1>News Feed</h1></div><span class="pill">● Live community</span></div>
+        <section id="composer" class="panel composer">
+          <div class="avatar" id="composerAvatar">C</div>
+          <form id="postForm" class="composer-form">
+            <textarea id="postText" rows="2" maxlength="3000" placeholder="What's on your mind? Share something good..." required></textarea>
+            <div class="composer-bottom"><label class="upload-label">＋ Photo/video<input id="postMedia" type="file" accept="image/*,video/*"></label><span id="mediaName" class="tiny muted"></span><button class="primary" type="submit">Publish post</button></div>
+          </form>
+        </section>
+        <div id="feedStatus" class="status-line"></div>
+        <div id="feedList" class="feed-list"><div class="panel empty">Connect to Supabase to load your feed.</div></div>
+      </section>
+
+      <section id="profileView" class="view hidden">
+        <div class="welcome-row"><div><div class="eyebrow">YOUR SPACE</div><h1>My Profile</h1></div></div>
+        <section class="panel profile-panel">
+          <div class="cover"></div><div class="profile-details"><div class="avatar huge" id="profileAvatar">C</div><div class="profile-title"><h2 id="profileName">Your profile</h2><p class="muted" id="profileEmail"></p></div></div>
+          <form id="profileForm" class="profile-form">
+            <label>Display name<input id="profileDisplayName" maxlength="60" placeholder="Your name"></label>
+            <label>Bio<textarea id="profileBio" maxlength="240" rows="3" placeholder="Tell people a little about yourself"></textarea></label>
+            <label>Profile photo<input id="profilePhoto" type="file" accept="image/*"></label>
+            <button class="primary" type="submit">Save profile</button><p id="profileMessage" class="form-message"></p>
+          </form>
+        </section>
+        <h2 class="section-heading">Your posts</h2><div id="myPosts" class="feed-list"></div>
+      </section>
+
+      <section id="friendsView" class="view hidden">
+        <div class="welcome-row"><div><div class="eyebrow">FIND YOUR PEOPLE</div><h1>Friends</h1></div></div>
+        <section class="panel pad"><h2>Friend requests</h2><div id="requestsList" class="people-list"></div></section>
+        <section class="panel pad"><h2>People on Cancele</h2><div id="peopleList" class="people-list"></div></section>
+      </section>
+
+      <section id="messagesView" class="view hidden">
+        <div class="welcome-row"><div><div class="eyebrow">PRIVATE CONVERSATIONS</div><h1>Messages</h1></div></div>
+        <section class="panel pad"><p class="muted">Choose a friend to start or open a conversation. Messages are available to the sender and recipient under the database access rules.</p><div id="messagePeople" class="people-list"></div></section>
+        <section class="panel chat-panel"><div class="chat-header"><div><b id="chatTitle">Select a friend</b><small id="chatSub" class="muted">Your conversation</small></div></div><div id="chatMessages" class="chat-messages"><div class="empty">Choose a friend above to load messages.</div></div><form id="messageForm" class="chat-compose"><input id="messageText" maxlength="2000" placeholder="Write a message..." required><button class="primary" type="submit">Send</button></form></section>
+      </section>
+
+      <section id="marketplaceView" class="view hidden">
+        <div class="welcome-row"><div><div class="eyebrow">BUY • SELL • DISCOVER</div><h1>Marketplace</h1></div></div>
+        <form id="listingForm" class="panel listing-form">
+          <h2>Create a listing</h2><div class="form-grid"><label>Item or service<input id="listingTitle" maxlength="100" required placeholder="e.g. Handmade TV stand"></label><label>Price (ZAR)<input id="listingPrice" type="number" min="0" step="0.01" required placeholder="500"></label></div>
+          <label>Description<textarea id="listingDescription" maxlength="1500" rows="3" placeholder="Describe the item, condition and collection/delivery details"></textarea></label>
+          <label>Listing photo<input id="listingPhoto" type="file" accept="image/*"></label><button class="primary" type="submit">Publish listing</button><p id="listingMessage" class="form-message"></p>
+        </form>
+        <div id="marketList" class="market-grid"></div>
+      </section>
+
+      <section id="adminView" class="view hidden">
+        <div class="welcome-row"><div><div class="eyebrow">COMMUNITY SAFETY</div><h1>Admin Console</h1></div><span class="pill">Restricted access</span></div>
+        <section class="panel pad"><h2>Recent posts</h2><p class="muted">Moderation controls appear only for accounts marked as administrators in Supabase.</p><div id="adminPosts" class="feed-list"></div></section>
+        <section class="panel pad"><h2>Admin setup</h2><p>To grant admin access, use the SQL instructions in <code>supabase-schema.sql</code> and set <code>profiles.is_admin</code> for a trusted account. Never grant admin access from this browser UI.</p></section>
+      </section>
+    </section>
+
+    <aside class="right-column">
+      <section class="panel right-card"><div class="card-heading"><h2>Community pulse</h2><span class="gold-dot"></span></div><p class="muted">Make connections that matter.</p><div class="stat-line"><span>Respect</span><b>Always</b></div><div class="stat-line"><span>Community</span><b>Everyone</b></div><div class="stat-line"><span>Good energy</span><b class="gold-text">Unlimited</b></div></section>
+      <section class="panel right-card"><h2>Community guidelines</h2><ul class="guidelines"><li>Be respectful and inclusive.</li><li>Only upload content you have permission to share.</li><li>Meet marketplace sellers safely.</li><li>Report suspicious activity to the site owner.</li></ul></section>
+      <section class="brand-footer"><span class="brand-mark small-mark">C</span><span>© <span id="year"></span> Cancele Social Media</span></section>
+    </aside>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="commentsDialog" class="comments-dialog"><div class="dialog-head"><h2>Comments</h2><button id="closeComments" class="quiet" type="button">✕</button></div><div id="commentsList" class="comments-list"></div><form id="commentForm" class="chat-compose"><input id="commentText" maxlength="1000" placeholder="Write a comment..." required><button class="primary" type="submit">Comment</button></form></dialog>
+  <script>
+    // Fill these two values from Supabase Project Settings > API.
+    // The publishable/anon key is intended for browser use with RLS enabled.
+    window.CANCELE_CONFIG = {
+      SUPABASE_URL: "YOUR_SUPABASE_PROJECT_URL",
+      SUPABASE_ANON_KEY: "YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY"
+    };
+  </script>
+</body>
+</html>
